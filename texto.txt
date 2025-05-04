@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Torneo de Pádel - Resultados</title>
+    <style>
+        /* Estilos generales para tablas */
+        table {
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            width: 50%;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
+        /* Clase para equipos clasificados */
+        .clasificado {
+            background-color: #d4edda; /* color verde claro */
+        }
+        /* Encabezados */
+        h1, h2, h3 {
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Torneo de Pádel - Resultados</h1>
+
+    <!-- Grupo A -->
+    <h2>Grupo A (5 equipos)</h2>
+    <table id="tablaA">
+        <thead>
+            <tr>
+                <th>Equipo 1</th>
+                <th>Equipo 2</th>
+                <th>Ganador</th>
+            </tr>
+        </thead>
+        <tbody id="bodyTablaA">
+            <!-- Filas se generarán con JavaScript -->
+        </tbody>
+    </table>
+    <h3>Marcador Grupo A</h3>
+    <table id="scoreA">
+        <thead>
+            <tr><th>Equipo</th><th>Partidos Ganados</th></tr>
+        </thead>
+        <tbody id="bodyScoreA">
+            <!-- Marcador se generará con JavaScript -->
+        </tbody>
+    </table>
+
+    <!-- Grupo B -->
+    <h2>Grupo B (4 equipos)</h2>
+    <table id="tablaB">
+        <thead>
+            <tr>
+                <th>Equipo 1</th>
+                <th>Equipo 2</th>
+                <th>Ganador</th>
+            </tr>
+        </thead>
+        <tbody id="bodyTablaB">
+            <!-- Filas se generarán con JavaScript -->
+        </tbody>
+    </table>
+    <h3>Marcador Grupo B</h3>
+    <table id="scoreB">
+        <thead>
+            <tr><th>Equipo</th><th>Partidos Ganados</th></tr>
+        </thead>
+        <tbody id="bodyScoreB">
+            <!-- Marcador se generará con JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        // Definir los equipos de cada grupo
+        const equiposA = ["Equipo A1", "Equipo A2", "Equipo A3", "Equipo A4", "Equipo A5"];
+        const equiposB = ["Equipo B1", "Equipo B2", "Equipo B3", "Equipo B4"];
+
+        // Obtener referencias a los cuerpos de tabla
+        const bodyTablaA = document.getElementById("bodyTablaA");
+        const bodyTablaB = document.getElementById("bodyTablaB");
+        const bodyScoreA = document.getElementById("bodyScoreA");
+        const bodyScoreB = document.getElementById("bodyScoreB");
+
+        // Generar filas de enfrentamientos para un grupo dado
+        function generarEnfrentamientos(equipos, bodyTabla, grupoId) {
+            let matchIndex = 0;
+            // Recorrer todas las combinaciones de equipos dentro del grupo
+            for (let i = 0; i < equipos.length; i++) {
+                for (let j = i + 1; j < equipos.length; j++) {
+                    const equipo1 = equipos[i];
+                    const equipo2 = equipos[j];
+                    // Crear fila
+                    const tr = document.createElement("tr");
+                    const td1 = document.createElement("td");
+                    td1.textContent = equipo1;
+                    const td2 = document.createElement("td");
+                    td2.textContent = equipo2;
+                    const td3 = document.createElement("td");
+
+                    // Crear opciones de radio para elegir el ganador
+                    const radio1 = document.createElement("input");
+                    radio1.type = "radio";
+                    radio1.name = `${grupoId}match${matchIndex}`;
+                    radio1.value = equipo1;
+                    const label1 = document.createElement("label");
+                    label1.appendChild(radio1);
+                    label1.appendChild(document.createTextNode(" " + equipo1));
+
+                    const radio2 = document.createElement("input");
+                    radio2.type = "radio";
+                    radio2.name = `${grupoId}match${matchIndex}`;
+                    radio2.value = equipo2;
+                    const label2 = document.createElement("label");
+                    label2.appendChild(radio2);
+                    label2.appendChild(document.createTextNode(" " + equipo2));
+
+                    // Insertar radios en la celda de ganador
+                    td3.appendChild(label1);
+                    td3.appendChild(document.createElement("br"));
+                    td3.appendChild(label2);
+
+                    // Añadir las celdas a la fila
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    tr.appendChild(td3);
+                    // Añadir fila al cuerpo de tabla
+                    bodyTabla.appendChild(tr);
+
+                    matchIndex++;
+                }
+            }
+        }
+
+        // Generar tabla de enfrentamientos para Grupo A y Grupo B
+        generarEnfrentamientos(equiposA, bodyTablaA, "A");
+        generarEnfrentamientos(equiposB, bodyTablaB, "B");
+
+        // Generar marcador inicial (filas con equipos y 0 partidos ganados)
+        function inicializarMarcador(equipos, bodyScore, prefix) {
+            for (let equipo of equipos) {
+                const tr = document.createElement("tr");
+                // Crear id para el row basado en el equipo (sin espacios)
+                const equipoId = equipo.replace(/\s+/g, "_");
+                tr.id = prefix + equipoId;
+                const tdName = document.createElement("td");
+                tdName.textContent = equipo;
+                const tdWins = document.createElement("td");
+                tdWins.textContent = "0";
+                tr.appendChild(tdName);
+                tr.appendChild(tdWins);
+                bodyScore.appendChild(tr);
+            }
+        }
+        inicializarMarcador(equiposA, bodyScoreA, "scoreA-");
+        inicializarMarcador(equiposB, bodyScoreB, "scoreB-");
+
+        // Función para actualizar el marcador y destacar clasificados
+        function actualizarMarcador() {
+            // Iniciar conteo de victorias en cero
+            const winsA = {};
+            const winsB = {};
+            for (let equipo of equiposA) winsA[equipo] = 0;
+            for (let equipo of equiposB) winsB[equipo] = 0;
+
+            // Contar selecciones marcadas para cada grupo
+            // Grupo A
+            const radiosA = document.querySelectorAll("#tablaA input[type='radio']:checked");
+            radiosA.forEach(radio => {
+                const ganador = radio.value;
+                if (winsA[ganador] !== undefined) {
+                    winsA[ganador]++;
+                }
+            });
+            // Grupo B
+            const radiosB = document.querySelectorAll("#tablaB input[type='radio']:checked");
+            radiosB.forEach(radio => {
+                const ganador = radio.value;
+                if (winsB[ganador] !== undefined) {
+                    winsB[ganador]++;
+                }
+            });
+
+            // Actualizar tabla de puntuaciones Grupo A
+            for (let equipo of equiposA) {
+                const equipoId = equipo.replace(/\s+/g, "_");
+                const row = document.getElementById("scoreA-" + equipoId);
+                const cells = row.getElementsByTagName("td");
+                // cells[1] es la celda de partidos ganados
+                cells[1].textContent = winsA[equipo];
+                // Destacar si tiene 2 o más victorias
+                if (winsA[equipo] >= 2) {
+                    row.classList.add("clasificado");
+                } else {
+                    row.classList.remove("clasificado");
+                }
+            }
+            // Actualizar tabla de puntuaciones Grupo B
+            for (let equipo of equiposB) {
+                const equipoId = equipo.replace(/\s+/g, "_");
+                const row = document.getElementById("scoreB-" + equipoId);
+                const cells = row.getElementsByTagName("td");
+                cells[1].textContent = winsB[equipo];
+                if (winsB[equipo] >= 2) {
+                    row.classList.add("clasificado");
+                } else {
+                    row.classList.remove("clasificado");
+                }
+            }
+        }
+
+        // Asociar eventos onchange a todos los inputs de tipo radio
+        const allRadios = document.querySelectorAll("input[type='radio']");
+        allRadios.forEach(radio => {
+            radio.addEventListener('change', actualizarMarcador);
+        });
+
+        // Llamar inicialmente para mostrar marcadores iniciales
+        actualizarMarcador();
+    </script>
+</body>
+</html>
